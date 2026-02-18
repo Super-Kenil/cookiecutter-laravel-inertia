@@ -13,12 +13,6 @@
     "Bootstrap",
     "Tailwind"
   ],
-  "frontend_pipeline": [
-    "None",
-    "Gulp",
-    "Vite"
-  ],
-  "has_plugins_config": "n",
   "_copy_without_render": [
     "app",
     "bootstrap",

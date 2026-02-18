@@ -9,16 +9,33 @@ HINT = "\x1b[3;33m"
 SUCCESS = "\033[38;5;35m"
 
 
-def remove_gulp_files():
-    file_names = ["gulpfile.js"]
-    for file_name in file_names:
-        Path(file_name).unlink()
+def configure_framework_files(framework):
+    react_files = ["tsconfig-react.json"]
+    vue_files = ["tsconfig-vue.json"]
 
+    if framework == "React":
+        for file in vue_files:
+            p = Path(file)
+            if p.exists():
+                p.unlink()
 
-def remove_packagejson_file():
-    file_names = ["package.json"]
-    for file_name in file_names:
-        Path(file_name).unlink()
+        for file in react_files:
+            p = Path(file)
+            if p.exists():
+                new_name = p.with_name(p.name.replace("-react", ""))
+                p.rename(new_name)
+
+    elif framework == "Vue":
+        for file in react_files:
+            p = Path(file)
+            if p.exists():
+                p.unlink()
+
+        for file in vue_files:
+            p = Path(file)
+            if p.exists():
+                new_name = p.with_name(p.name.replace("-vue", ""))
+                p.rename(new_name)
 
 
 def update_package_json(remove_dev_deps=None, remove_keys=None, scripts=None):
@@ -36,30 +53,32 @@ def update_package_json(remove_dev_deps=None, remove_keys=None, scripts=None):
     package_json.write_text(updated_content)
 
 
-def handle_js_runner(frontend_pipeline, ui_library):
-    if frontend_pipeline == "Gulp":
+def handle_js_runner(framework, ui_library):
+    if framework == "React":
+        remove_dev_deps = ["@vitejs/plugin-vue", "@vue/eslint-config-typescript", "eslint-plugin-vue", "vue-tsc", "@inertiajs/vue3", "vue"]
         if ui_library == "Tailwind":
-            scripts = {"dev": "gulp", "build": "gulp build"}
-            remove_dev_deps = [
-                "sass",
-                "gulp-sass",
-                "gulp-uglify-es",
-                "node-sass-tilde-importer"
-            ]
-        else:
-            scripts = {"dev": "gulp", "build": "gulp build"}
-            remove_dev_deps = ["@tailwindcss/postcss"]
-        update_package_json(remove_dev_deps=remove_dev_deps, scripts=scripts)
+            remove_dev_deps = []
+        elif ui_library == "Bootstrap":
+            remove_dev_deps.extend(["@tailwindcss/vite", "prettier-plugin-tailwindcss", "tailwindcss"])
+
+        update_package_json(remove_dev_deps=remove_dev_deps)
+
+    elif framework == "Vue":
+        remove_dev_deps = ["@types/react",  "@types/react-dom", "@vitejs/plugin-react", "babel-plugin-react-compiler", "eslint-plugin-react", "eslint-plugin-react-hooks", "@inertiajs/react", "react", "react-dom"]
+        if ui_library == "Tailwind":
+            remove_dev_deps = []
+        elif ui_library == "Bootstrap":
+            remove_dev_deps.extend(["@tailwindcss/vite", "prettier-plugin-tailwindcss", "tailwindcss"])
+
+        update_package_json(remove_dev_deps=remove_dev_deps)
 
 
 def main():
-    # if "{{ cookiecutter.frontend_pipeline }}" in ["None"]:
-    #     remove_gulp_files()
-    #     remove_packagejson_file()
-    # else:
-    #     handle_js_runner(
-    #         "{{ cookiecutter.frontend_pipeline }}", "{{ cookiecutter.ui_library }}"
-    #     )
+    if "{{ cookiecutter.framework }}" != "None":
+        configure_framework_files("{{ cookiecutter.framework }}")
+
+    if "{{ cookiecutter.framework }}" != "None":
+        handle_js_runner("{{ cookiecutter.framework }}", "{{ cookiecutter.ui_library }}")
 
     print(SUCCESS + "Project initialized, keep up the good work!" + TERMINATOR)
 
