@@ -19,7 +19,7 @@
     "config",
     "database",
     "public",
-    "resources",
+    "resources/js",
     "routes",
     "storage",
     "tests"
