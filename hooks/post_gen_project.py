@@ -84,7 +84,7 @@ def main():
     if "{{ cookiecutter.framework }}" != "None":
         configure_framework_files("{{ cookiecutter.framework }}")
 
-    if "{{ cookiecutter.framework }}" != "None":
+    # if "{{ cookiecutter.framework }}" != "None":
         # handle_js_runner("{{ cookiecutter.framework }}", "{{ cookiecutter.ui_library }}")
 
     print(SUCCESS + "Project initialized, keep up the good work!" + TERMINATOR)
